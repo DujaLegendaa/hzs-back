@@ -25,6 +25,10 @@ const eventSchema = new mongoose.Schema({
   description: {
     type: String,
     required: [true, 'description not provided']
+  },
+  orgName: {
+    type: String,
+    required: [true, 'orgName not provided']
   }
 })
 

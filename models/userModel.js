@@ -59,6 +59,10 @@ const userSchema = new mongoose.Schema({
     type: [mongoose.Schema.Types.ObjectId],
     ref: 'Event'
   },
+  points: {
+    type: Number,
+    default: 0
+  },
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,

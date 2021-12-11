@@ -6,6 +6,7 @@ const AppError = require('../utils/appError')
 
 exports.setCreator = (req, res, next) => {
   req.body._creator = req.user._id
+  req.body.orgName = req.user.organizationName
   next()
 }
 
