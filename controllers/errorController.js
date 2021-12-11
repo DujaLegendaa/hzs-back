@@ -26,6 +26,6 @@ const handleDuplicateFieldsDB = (error) => {
   keyVal = keyVal.substring(12, keyVal.length - 1).split(':')
   const field = keyVal[0].substring(1, keyVal[0].length - 1)
   const value = keyVal[1].substring(1, keyVal[1].length - 1)
-  error.message = `Enitity with ${field} : ${value} already exists. Please use something else.`
+  error.message = `Enitet sa ${field} : ${value} već postoji. Molimo vas koristite drugi.`
   return error
 }
