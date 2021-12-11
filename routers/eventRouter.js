@@ -15,4 +15,8 @@ router
   .patch(authController.protect, eventController.updateEvent)
   .delete(authController.protect, eventController.deleteEvent)
 
+router.get('/:id/isCreator', authController.protect, eventController.isCreator)
+router.post('/:id/join', authController.protect, eventController.join)
+router.post('/:id/leave', authController.protect, eventController.leave)
+
 module.exports = router

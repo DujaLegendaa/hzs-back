@@ -2,6 +2,7 @@
 const factory = require('./handlerFactory')
 const Event = require('./../models/eventModel')
 const User = require('./../models/userModel')
+const AppError = require('../utils/appError')
 
 exports.setCreator = (req, res, next) => {
   req.body._creator = req.user._id
@@ -60,6 +61,66 @@ exports.deleteEvent = catchAsync(async (req, res, next) => {
     )
 
   await Event.findByIdAndDelete(req.params.id)
+
+  res.status(200).json({
+    status: 'success',
+    data: null,
+  })
+})
+
+exports.isCreator = catchAsync(async (req, res, next) => {
+  const doc = await Event.findById(req.params.id)
+
+  if (!doc)
+    return next(new AppError(`No document found with id ${req.params.id}`, 404))
+
+  res.status(200).json({
+    status: 'success',
+    data: { isCreator: doc._creator.equals(req.user._id) },
+  })
+})
+
+exports.join = catchAsync(async (req, res, next) => {
+  const ev = await Event.findById(req.params.id)
+
+  if (!ev)
+    return next(new AppError(`No document found with id ${req.params.id}`, 404))
+
+  const user = await User.findById(req.user._id)
+  if(user.joinedEvents.includes(ev._id))
+    return next(new AppError('User has already joined this event', 400))
+
+  user.joinedEvents.push(ev._id)
+  ev.participants.push(user._id)
+
+  user.save({validateBeforeSave: false})
+  ev.save()
+
+  res.status(200).json({
+    status: 'success',
+    data: { doc: ev},
+  })
+})
+
+exports.leave = catchAsync(async (req, res, next) => {
+  let ev = await Event.findById(req.params.id)
+
+  if (!ev)
+    return next(new AppError(`No document found with id ${req.params.id}`, 404))
+
+  const user = await User.findById(req.user._id)
+  if(!user.joinedEvents.includes(ev._id))
+    return next(new AppError('User has not joined this event', 400))
+
+  await User.findByIdAndUpdate(req.user._id, {
+    $pullAll: { joinedEvents: [req.params.id] },
+  })
+  await Event.findByIdAndUpdate(req.params.id, {
+    $pullAll: { participants: [req.user._id] },
+  })
+  
+  ev = await Event.findById(req.params.id)
+  ev.save()
 
   res.status(200).json({
     status: 'success',

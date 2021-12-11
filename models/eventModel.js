@@ -14,19 +14,24 @@ const eventSchema = new mongoose.Schema({
     type: Date,
     required: [true, 'date not provided']
   },
-  numParticipants: {
-    type: Number,
-    required: [true, 'number of participants not provided']
-  },
   participants: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: 'User'
+  },
+  numParticipants: {
+    type: Number
   },
   //point for user
   description: {
     type: String,
     required: [true, 'description not provided']
   }
+})
+
+eventSchema.pre('validate', async function (next) {
+  this.numParticipants = this.participants.length
+
+  next()
 })
 
 
