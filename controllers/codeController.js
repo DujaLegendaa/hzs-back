@@ -3,11 +3,12 @@ const Code = require('./../models/codeModel')
 const crypto = require('crypto')
 const AppError = require('../utils/appError')
 const User = require('./../models/userModel')
+const Event = require('./../models/eventModel')
+const ApiFeatures = require('./../utils/apiFeatures')
 
 exports.generateOne = catchAsync(async (req, res, next) => {
   const newDoc = await Code.create({
     _forUser: req.body._forUser,
-    value: crypto.randomBytes(16).toString('hex'),
     points: req.body.points
   })
 
@@ -16,6 +17,27 @@ exports.generateOne = catchAsync(async (req, res, next) => {
     data: { newDoc },
   })
 }) 
+
+exports.generateForEvent = catchAsync(async (req, res, next) => {
+  const ev = await Event.findById(req.params.id)
+  let codeList = []
+  let cList = []
+  if(!ev)
+    return next(new AppError(`No event with id ${req.params.id}`, 404))
+  if(ev.date >= Date.now())
+    return next(new AppError('You can only generate codes after the event starts', 400))
+  for(const el of ev.participants){
+      const newCode = await Code.create({_forUser: el, points: ev.pointsPerParticipant})
+      cList.push(newCode)
+      codeList.push(newCode._id)
+    }
+  ev.codes = codeList
+  ev.save()
+  res.status(201).json({
+    status: 'success',
+    data: { doc: cList }
+  })
+})
 
 exports.consume = catchAsync(async (req, res, next) => {
   const doc = await Code.findById(req.params.id)
@@ -39,5 +61,18 @@ exports.consume = catchAsync(async (req, res, next) => {
   res.status(201).json({
     status: 'success',
     data: { doc: user },
+  })
+})
+
+exports.forUser = catchAsync(async (req, res, next) => {
+  const doc = await Code.findById(req.params.id).select("_forUser").populate("_forUser")
+  if (!doc)
+      return next(
+        new AppError(`No document found with id ${req.params.id}`, 404),
+      )
+
+  res.status(201).json({
+    status: 'success',
+    data: { doc },
   })
 })

@@ -103,6 +103,18 @@ exports.join = catchAsync(async (req, res, next) => {
   })
 })
 
+exports.isParticipating = catchAsync(async (req, res, next) => {
+  const ev = await Event.findById(req.params.id)
+
+  if (!ev)
+    return next(new AppError(`No document found with id ${req.params.id}`, 404))
+
+  res.status(200).json({
+    status: 'success',
+    data: { isParticipating: ev.participants.includes(req.user._id)},
+  })
+})
+
 exports.leave = catchAsync(async (req, res, next) => {
   let ev = await Event.findById(req.params.id)
 

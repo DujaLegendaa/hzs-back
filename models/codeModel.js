@@ -3,10 +3,8 @@ const mongoose = require('mongoose')
 const codeSchema = new mongoose.Schema({
   _forUser: {
     type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: [true, 'code must be for user']
-  },
-  value: {
-    type: String,
   },
   activated: {
     type: Boolean,

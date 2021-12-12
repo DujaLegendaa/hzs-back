@@ -29,6 +29,14 @@ const eventSchema = new mongoose.Schema({
   orgName: {
     type: String,
     required: [true, 'orgName not provided']
+  },
+  codes: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'Code'
+  },
+  pointsPerParticipant: {
+    type: Number,
+    required: [true, 'points must be given']
   }
 })
 
