@@ -19,6 +19,10 @@ const codeSchema = new mongoose.Schema({
       },
       message: "Code can't give negative points"
     }
+  },
+  orgName: {
+    type: String,
+    required: [true]
   }
 })
 

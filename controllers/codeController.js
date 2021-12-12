@@ -27,7 +27,7 @@ exports.generateForEvent = catchAsync(async (req, res, next) => {
   if(ev.date >= Date.now())
     return next(new AppError('You can only generate codes after the event starts', 400))
   for(const el of ev.participants){
-      const newCode = await Code.create({_forUser: el, points: ev.pointsPerParticipant})
+      const newCode = await Code.create({_forUser: el, points: ev.pointsPerParticipant, orgName: ev.orgName})
       cList.push(newCode)
       codeList.push(newCode._id)
     }
@@ -53,7 +53,21 @@ exports.consume = catchAsync(async (req, res, next) => {
 
   doc.activated = true
   const user = await User.findById(req.user._id)
-  user.points += doc.points
+  switch (doc.orgName) {
+    case "SBB":
+      user.points[0] += doc.points;
+      break;
+    case "Gigatron":
+      user.points[1] += doc.points;
+      break;
+    case "Technomedia":
+      user.points[2] += doc.points;
+      break;
+    case "anjaCorp":
+      user.points[3] += doc.points;
+    default:
+      break;
+  }
 
   doc.save()
   user.save({validateBeforeSave: false})
