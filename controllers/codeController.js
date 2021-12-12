@@ -43,13 +43,13 @@ exports.consume = catchAsync(async (req, res, next) => {
   const doc = await Code.findById(req.params.id)
   if (!doc)
       return next(
-        new AppError(`No document found with id ${req.params.id}`, 404),
+        new AppError(`Nije pronadjen dokument sa id ${req.params.id}`, 404),
       )
   if(!doc._forUser.equals(req.user._id))
-    return next(new AppError('Code is not for this user', 400))
+    return next(new AppError('Kod nije za ovog korisnika', 400))
 
   if(doc.activated)
-    return next(new AppError('Code is already activated', 400))
+    return next(new AppError('Kod je već aktiviran', 400))
 
   doc.activated = true
   const user = await User.findById(req.user._id)

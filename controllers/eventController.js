@@ -33,11 +33,11 @@ exports.updateEvent = catchAsync(async (req, res, next) => {
   const doc = await Event.findById(req.params.id)
 
   if (!doc)
-    return next(new AppError(`No document found with id ${req.params.id}`, 404))
+    return next(new AppError(`Nije pronadjen ni jedan dokument sa id ${req.params.id}`, 404))
 
   if (!doc._creator.equals(req.user._id))
     return next(
-      new AppError("You don't have permission to update this event", 401),
+      new AppError("Nemate dozvolu da izmenite ovaj dogadjaj.", 401),
     )
 
   const updatedDoc = await Event.findByIdAndUpdate(req.params.id, req.body, {
@@ -54,11 +54,11 @@ exports.updateEvent = catchAsync(async (req, res, next) => {
 exports.deleteEvent = catchAsync(async (req, res, next) => {
   const doc = await Event.findById(req.params.id)
 
-  if (!doc) return next(new AppError('No document found with id ' + id, 404))
+  if (!doc) return next(new AppError('Nije pronadjen ni jedan dokument sa id ' + id, 404))
 
   if (!doc._creator.equals(req.user._id))
     return next(
-      new AppError("You don't have permission to delete this recipe", 401),
+      new AppError("Nemate dozvolu da obrišete ovaj dogadjaj.", 401),
     )
 
   await Event.findByIdAndDelete(req.params.id)
@@ -73,7 +73,7 @@ exports.isCreator = catchAsync(async (req, res, next) => {
   const doc = await Event.findById(req.params.id)
 
   if (!doc)
-    return next(new AppError(`No document found with id ${req.params.id}`, 404))
+    return next(new AppError(`Nije pronadjen ni jedan dokument sa id ${req.params.id}`, 404))
 
   res.status(200).json({
     status: 'success',
@@ -85,11 +85,11 @@ exports.join = catchAsync(async (req, res, next) => {
   const ev = await Event.findById(req.params.id)
 
   if (!ev)
-    return next(new AppError(`No document found with id ${req.params.id}`, 404))
+    return next(new AppError(`Nije pronadjen ni jedan dokument sa id ${req.params.id}`, 404))
 
   const user = await User.findById(req.user._id)
   if(user.joinedEvents.includes(ev._id))
-    return next(new AppError('User has already joined this event', 400))
+    return next(new AppError('Korisnik je već prijavljen za ovaj dogadjaj.', 400))
 
   user.joinedEvents.push(ev._id)
   ev.participants.push(user._id)
@@ -119,11 +119,11 @@ exports.leave = catchAsync(async (req, res, next) => {
   let ev = await Event.findById(req.params.id)
 
   if (!ev)
-    return next(new AppError(`No document found with id ${req.params.id}`, 404))
+    return next(new AppError(`Nije pronadjen ni jedan dokument sa id ${req.params.id}`, 404))
 
   const user = await User.findById(req.user._id)
   if(!user.joinedEvents.includes(ev._id))
-    return next(new AppError('User has not joined this event', 400))
+    return next(new AppError('Korisnik nije prijavljen ya ovaj dogadjaj.', 400))
 
   await User.findByIdAndUpdate(req.user._id, {
     $pullAll: { joinedEvents: [req.params.id] },

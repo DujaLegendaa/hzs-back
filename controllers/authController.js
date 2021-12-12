@@ -48,12 +48,12 @@ module.exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body
 
   if (!email || !password)
-    return next(new AppError('Please provide email and password!', 400))
+    return next(new AppError('Molim vas da unesete email!', 400))
 
   const user = await User.findOne({ email }).select('+password')
 
   if (!user || !(await user.correctPassword(password)))
-    return next(new AppError('Incorrect email or password', 400))
+    return next(new AppError('Netačna šifra ili email!', 400))
 
   createSendToken(user, 200, res)
 })
@@ -69,7 +69,7 @@ module.exports.protect = catchAsync(async (req, res, next) => {
   if (!token)
     return next(
       new AppError(
-        'You are not logged in. Please log in to access this route.',
+        'Niste prijavljeni, molimo vas da se prijavite da bi pristupili ruti.',
         401,
       ),
     )
@@ -81,11 +81,11 @@ module.exports.protect = catchAsync(async (req, res, next) => {
 
   const user = await User.findById(decoded.id)
   if (!user)
-    return next(new AppError('The user with this token does not exist', 401))
+    return next(new AppError('Korisnik sa ovim tokenom ne postoji.', 401))
 
   if (user.changedPasswordAfter(decoded.iat))
     return next(
-      new AppError('User recently changed password. Please log in again.', 401),
+      new AppError('Promenjena je šifra, molimo vas ulogujte se ponovo.', 401),
     )
 
   req.user = user
@@ -96,7 +96,7 @@ module.exports.restrictToRole = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role))
       return next(
-        new AppError('You do not have permission to access this route'),
+        new AppError('Nemate dozvolu da pristupite ovoj ruti!'),
       )
 
     next()
@@ -106,7 +106,7 @@ module.exports.restrictToRole = (...roles) => {
 module.exports.forgotPassword = catchAsync(async (req, res, next) => {
   const user = User.findOne({ email: req.body.email })
   if (!user)
-    return next(new AppError('There is no user with this email address', 404))
+    return next(new AppError('Ne postoji korisnik sa ovom email adresom.', 404))
 
   const resetToken = user.createPasswordResetToken()
   await user.save({ validateBeforeSave: false })

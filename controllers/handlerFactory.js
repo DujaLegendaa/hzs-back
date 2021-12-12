@@ -29,7 +29,7 @@ exports.getOne = (Model) =>
 
     if (!doc)
       return next(
-        new AppError(`No document found with id ${req.params.id}`, 404),
+        new AppError(`Nije pronadjen ni jedan dokument sa id ${req.params.id}`, 404),
       )
 
     res.status(200).json({
@@ -47,7 +47,7 @@ exports.updateOne = (Model) =>
 
     if (!updatedDoc)
       return next(
-        new AppError(`No document found with id ${req.params.id}`, 404),
+        new AppError(`Nije pronadjen ni jedan dokument sa id ${req.params.id}`, 404),
       )
 
     res.status(200).json({
@@ -60,7 +60,7 @@ exports.deleteOne = (Model) =>
   catchAsync(async (req, res, next) => {
     const doc = await Model.findByIdAndDelete(req.params.id)
 
-    if (!doc) return next(new AppError('No document found with id ' + id, 404))
+    if (!doc) return next(new AppError('Nije pronadjen ni jedan dokument sa id ' + id, 404))
 
     res.status(200).json({
       status: 'success',
