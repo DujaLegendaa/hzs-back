@@ -21,5 +21,6 @@ router.post('/:id/join', authController.protect, eventController.join)
 router.get('/:id/join', authController.protect, eventController.isParticipating)
 router.post('/:id/leave', authController.protect, eventController.leave)
 router.get('/:id/codes', authController.protect, codeController.generateForEvent)
+router.get('/:id/participants', eventController.getParticipants)
 
 module.exports = router

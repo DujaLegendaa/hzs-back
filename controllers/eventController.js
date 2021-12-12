@@ -140,3 +140,12 @@ exports.leave = catchAsync(async (req, res, next) => {
     data: null,
   })
 })
+
+exports.getParticipants = catchAsync(async (req, res, next) => {
+  let docs = await Event.findById(req.params.id).select('participants').populate('participants')
+
+  res.status(200).json({
+    status: 'success',
+    data: docs,
+  })
+})
